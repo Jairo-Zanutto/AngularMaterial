@@ -1,0 +1,399 @@
+<html lang = "en">
+   <head>
+      <link rel = "stylesheet"
+         href = "https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+      <link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
+      <style>
+        .box {         
+            text-align:center;
+            border-style: inset;
+         }
+		 
+		 .datepickerdemo md-content {
+            padding-bottom: 200px; 
+         }
+         
+        .datepickerdemo .validation-messages {
+            font-size: 11px;
+            color: darkred;
+            margin: 10px 0 0 25px; 
+         }
+      </style>
+      <script language = "javascript">
+         angular
+            .module('firstApplication', ['ngMaterial'])
+            .controller('inputController', inputController)
+			.controller('autoCompleteController', autoCompleteController)
+			.controller('layoutController', layoutController)
+			.controller('radioButtonsController', radioButtonsController)
+			.controller('dateController', dateController);
+
+         function inputController ($scope) {
+            $scope.project = {
+               comments: 'Comments',    
+            };
+         } 
+
+
+		 function autoCompleteController ($timeout, $q, $log) {
+            var self = this;
+            self.simulateQuery = false;
+            self.isDisabled    = false;
+            
+            // list of states to be displayed
+            self.states        = loadStates();
+            self.querySearch   = querySearch;
+            self.selectedItemChange = selectedItemChange;
+            self.searchTextChange   = searchTextChange;
+            self.newState = newState;
+            
+            function newState(state) {
+               alert("This functionality is yet to be implemented!");
+            }
+            
+            function querySearch (query) {
+               var results = query ? self.states.filter( createFilterFor(query) ) :
+                  self.states, deferred;
+                  
+               if (self.simulateQuery) {
+                  deferred = $q.defer();
+                     
+                  $timeout(function () { 
+                     deferred.resolve( results ); 
+                  }, 
+                  Math.random() * 1000, false);
+                  return deferred.promise;
+               } else {
+                  return results;
+               }
+            }
+            
+            function searchTextChange(text) {
+               $log.info('Text changed to ' + text);
+            }
+            
+            function selectedItemChange(item) {
+               $log.info('Item changed to ' + JSON.stringify(item));
+            }
+            
+            //build list of states as map of key-value pairs
+            function loadStates() {
+               var allStates = 'Acre, Alagoas, Amapá, Amazonas, Bahia, Ceará, Distrito Federal, Espírito Santo, Goiás, Maranhão,\
+                                Mato Grosso, Mato Grosso do Sul, Minas Gerais, Pará, Paraíba, Paraná, Pernambuco, Piauí, Rio de Janeiro,\
+                                Rio Grande do Norte, Rio Grande do Sul, Rondônia, Roraima, Santa Catarina, São Paulo, Sergipe, Tocantins';
+                  
+				  
+			
+              /* var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
+                  Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
+                  Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,\
+                  Nebraska, Nevada, New Hampshire, New Jersey, New Mexico, New York, North Carolina,\
+                  North Dakota, Ohio, Oklahoma, Oregon, Pennsylvania, Rhode Island, South Carolina,\
+                  South Dakota, Tennessee, Texas, Utah, Vermont, Virginia, Washington, West Virginia,\
+                  Wisconsin, Wyoming';*/
+
+				  
+               return allStates.split(/, +/g).map( function (state) {
+                  return {
+                     value: state.toLowerCase(),
+                     display: state
+                  };
+               });
+            }
+            
+            //filter function for search query
+            function createFilterFor(query) {
+               var lowercaseQuery = angular.lowercase(query);
+               return function filterFn(state) {
+                  return (state.value.indexOf(lowercaseQuery) === 0);
+               };
+            }
+         } 
+
+		function layoutController ($scope) {            
+         }
+      
+	    function radioButtonsController ($scope) {
+            $scope.radioData = [
+               { label: 'Masculino', value: 'Masculino' },
+               { label: 'Feminino', value: 'Feminino' },
+            ];
+        }
+	  
+		function dateController ($scope) {
+           $scope.myDate = new Date();
+           $scope.minDate = new Date(
+              $scope.myDate.getFullYear(),
+              $scope.myDate.getMonth() - 2,
+              $scope.myDate.getDate());
+              
+           $scope.maxDate = new Date(
+              $scope.myDate.getFullYear(),
+              $scope.myDate.getMonth() + 2,
+              $scope.myDate.getDate());
+              
+           $scope.onlyWeekendsPredicate = function(date) {
+              var day = date.getDay();
+              return day === 0 || day === 6;
+           }
+        }
+		
+	  </script>     	  
+   </head>
+   
+   <body ng-app = "firstApplication"> 
+   
+   	  <div id = "layoutContainer" ng-controller = "layoutController as ctrl"
+         style = "height:100px;" ng-cloak>
+   
+	     
+            
+ 
+
+		
+		<div id = "inputContainer" class = "inputDemo"
+         ng-controller = "inputController" ng-cloak>
+			 <md-content layout-padding>
+				<form name = "projectForm">
+					<div layout = "column" layout-xs = "column">
+						<div flex = "33" class = "box">Dados Pessoais</div>
+					</div> 
+					
+					<div layout = "row" layout-xs = "column">
+						<div flex = "20" >
+							<md-input-container class = "md-block">
+								<label>Nome</label>
+								<input required name = "nome" ng-model = "project.nome">
+								<div ng-messages = "projectForm.nome.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+						<div flex >
+							<md-input-container class = "md-block">
+								<label>Sobrenome</label>
+								<input required name = "sobrenome" ng-model = "project.sobrenome">
+								<div ng-messages = "projectForm.sobrenome.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+					</div> 
+					
+					
+					<div layout = "row" layout-xs = "column">
+						<div flex = "20" >
+							<div id = "radioButtonsContainer" ng-controller = "radioButtonsController as ctrl"
+							 layout = "column" ng-cloak>
+							 <p>Sexo: <span>{{ group }}</span> </p>
+							 <md-radio-group ng-model = "group" class = "md-primary">
+								<md-radio-button ng-repeat = "d in radioData"
+								   ng-value = "d.value"
+								   ng-disabled = " d.isDisabled "
+								   ng-class = "{'md-align-top-left': $index==1}" >
+								   {{ d.label }}<br/>
+								</md-radio-button>
+							 </md-radio-group>  
+							</div>
+						</div>
+						
+						<div flex >
+							<div class = "datepickerdemo" ng-controller = "dateController as ctrl"
+							layout = "column" ng-cloak>
+								<md-content>
+									<label>Data de nascimento</label>
+									<md-datepicker 
+									ng-model = "myDate" 
+									md-placeholder = "Enter date"></md-datepicker>																																		
+								</md-content>
+							</div>
+						</div>
+					</div> 
+
+					<div layout = "column" layout-xs = "column">
+						<div flex = "33" class = "box">Endereço residencial</div>
+					</div> 
+
+					<div layout = "row" layout-xs = "column">
+						<div  flex>
+							<md-input-container class = "md-block">
+								<label>Rua</label>
+								<input required name = "rua" ng-model = "project.rua">
+								<div ng-messages = "projectForm.rua.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<md-input-container class = "md-block">
+								<label>Número</label>
+								<input required name = "numero" ng-model = "project.numero">
+								<div ng-messages = "projectForm.numero.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+					</div> 
+					
+					<div layout = "row" layout-xs = "column">
+						<div  flex>
+							<md-input-container class = "md-block">
+								<label>Bairro</label>
+								<input required name = "bairro" ng-model = "project.bairro">
+								<div ng-messages = "projectForm.bairro.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<md-input-container class = "md-block">
+								<label>CEP</label>
+								<input required name = "cep" ng-model = "project.cep">
+								<div ng-messages = "projectForm.cep.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+					</div>
+					
+					<div layout = "row" layout-xs = "column">
+						<div  flex = "20">
+							<md-input-container class = "md-block">
+								<label>Cidade</label>
+								<input required name = "cidade" ng-model = "project.cidade">
+								<div ng-messages = "projectForm.cidade.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<div ng-controller = "autoCompleteController as ctrl" layout = "column" ng-cloak>
+								<md-content class = "md-padding">
+								<form ng-submit = "$event.preventDefault()">
+								<md-autocomplete
+									ng-disabled = "ctrl.isDisabled"
+									md-no-cache = "ctrl.noCache"
+									md-selected-item = "ctrl.selectedItem"
+									md-search-text-change = "ctrl.searchTextChange(ctrl.searchText)"
+									md-search-text = "ctrl.searchText"
+									md-selected-item-change = "ctrl.selectedItemChange(item)"
+									md-items = "item in ctrl.querySearch(ctrl.searchText)"
+									md-item-text = "item.display"
+									md-min-length = "0"
+									placeholder = "Estado">
+									
+									<md-item-template>
+										<span md-highlight-text = "ctrl.searchText"
+											md-highlight-flags = "^i">{{item.display}}</span>
+									</md-item-template>
+									
+									<md-not-found>
+										No states matching "{{ctrl.searchText}}" were found.
+										<a ng-click = "ctrl.newState(ctrl.searchText)">Create a new one!</a>
+									</md-not-found>
+								</md-autocomplete>
+								<br/>
+								</form>
+								</md-content>
+							</div>
+						</div>
+					</div>
+						   
+				   
+					<div layout = "column" layout-xs = "column">
+						<div flex = "33" class = "box">Endereço comercial</div>
+					</div> 
+
+					<div layout = "row" layout-xs = "column">
+						<div  flex>
+							<md-input-container class = "md-block">
+								<label>Rua</label>
+								<input  name = "rua" ng-model = "project.rua">
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<md-input-container class = "md-block">
+								<label>Número</label>
+								<input  name = "numero" ng-model = "project.numero">
+							</md-input-container>
+						</div>
+					</div> 
+					
+					<div layout = "row" layout-xs = "column">
+						<div  flex>
+							<md-input-container class = "md-block">
+								<label>Bairro</label>
+								<input  name = "bairro" ng-model = "project.bairro">
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<md-input-container class = "md-block">
+								<label>CEP</label>
+								<input  name = "cep" ng-model = "project.cep">
+							</md-input-container>
+						</div>
+					</div>
+					
+					<div layout = "row" layout-xs = "column">
+						<div  flex = "20">
+							<md-input-container class = "md-block">
+								<label>Cidade</label>
+								<input  name = "cidade" ng-model = "project.cidade">
+							</md-input-container>
+						</div>
+						<div flex = "20" >
+							<div ng-controller = "autoCompleteController as ctrl" layout = "column" ng-cloak>
+								<md-content class = "md-padding">
+								<form ng-submit = "$event.preventDefault()">
+								<md-autocomplete
+									ng-disabled = "ctrl.isDisabled"
+									md-no-cache = "ctrl.noCache"
+									md-selected-item = "ctrl.selectedItem"
+									md-search-text-change = "ctrl.searchTextChange(ctrl.searchText)"
+									md-search-text = "ctrl.searchText"
+									md-selected-item-change = "ctrl.selectedItemChange(item)"
+									md-items = "item in ctrl.querySearch(ctrl.searchText)"
+									md-item-text = "item.display"
+									md-min-length = "0"
+									placeholder = "Estado">
+									
+									<md-item-template>
+										<span md-highlight-text = "ctrl.searchText"
+											md-highlight-flags = "^i">{{item.display}}</span>
+									</md-item-template>
+									
+									<md-not-found>
+										No states matching "{{ctrl.searchText}}" were found.
+										<a ng-click = "ctrl.newState(ctrl.searchText)">Create a new one!</a>
+									</md-not-found>
+								</md-autocomplete>
+								<br/>
+								</form>
+								</md-content>
+							</div>
+						</div>
+					</div>
+					
+					<div layout = "column" layout-xs = "column">
+						<div flex = "33" class = "box">Informações financeiras</div>
+					</div> 
+					
+					<md-input-container class = "md-block">
+								<label>Número do cartão de crédito</label>
+								<input required name = "ncartao" ng-model = "project.ncartao">
+								<div ng-messages = "projectForm.ncartao.$error">
+									<div ng-message = "required">Campo obrigatório.</div>
+								</div>
+					</md-input-container>
+					
+				</form>
+			 </md-content>
+      </div>
+
+   </body>
+</html>
